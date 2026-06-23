@@ -1,0 +1,60 @@
+# ========================
+# Spring Boot (sb-ecommerce)
+# ========================
+sb-ecommerce/target/
+sb-ecommerce/.idea/
+sb-ecommerce/*.iml
+
+# ========================
+# React (frontend)
+# ========================
+frontend/node_modules/
+frontend/build/
+frontend/.env.local
+
+# ========================
+# Secrets
+# ========================
+.env
+application-local.properties
+application-secret.properties
+
+# ========================
+# OS & Editor
+# ========================
+.DS_Store
+.vscode/
+
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
