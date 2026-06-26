@@ -1,7 +1,8 @@
 package com.ecommerce.controllers;
 
-import com.ecommerce.model.Category;
-import com.ecommerce.service.CategoryService;
+import com.ecommerce.models.Category;
+import com.ecommerce.services.CategoryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class CategoryController {
 
     @PostMapping("/categories")
     public ResponseEntity<String> createCategory(@RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.createCategory(category));
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(category));
     }
 
     @PutMapping("/categories/{categoryId}")
