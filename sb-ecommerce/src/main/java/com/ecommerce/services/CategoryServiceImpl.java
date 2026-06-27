@@ -1,11 +1,11 @@
 package com.ecommerce.services;
 
+import com.ecommerce.exceptions.APIException;
+import com.ecommerce.exceptions.ResourceNotFoundException;
 import com.ecommerce.models.Category;
 import com.ecommerce.repositories.CategoryRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -26,16 +26,20 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public String createCategory(Category category) {
-        categoryRepository.save(category);
-        return "Added category: " + category.getCategoryName();
+    public Category createCategory(Category category) {
+        categoryRepository.findByCategoryNameIgnoreCase(category.getCategoryName())
+            .ifPresent(categoryFound -> {
+                throw new APIException("Category " + categoryFound.getCategoryName() + " already exist. Duplicates are not allowed!!");
+            });
+
+        return categoryRepository.save(category);
     }
 
     @Override
     @Transactional
     public String deleteCategory(Long categoryId) {
         Category categoryToBeDeleted = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
         categoryRepository.delete(categoryToBeDeleted);
         return "Deleted category: " + categoryId;
@@ -45,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public String updateCategory(Long categoryId, Category category) {
         Category categoryFound = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
         categoryFound.setCategoryName(category.getCategoryName());
 
