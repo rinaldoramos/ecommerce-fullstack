@@ -1,13 +1,13 @@
 package com.ecommerce.controllers;
 
-import com.ecommerce.models.Category;
+import com.ecommerce.common.PagedResponse;
+import com.ecommerce.payload.CategoryRequest;
+import com.ecommerce.payload.CategoryResponse;
 import com.ecommerce.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -20,22 +20,23 @@ public class CategoryController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<List<Category>> getAllCategories() {
+    public ResponseEntity<PagedResponse<CategoryResponse>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @PostMapping("/categories")
-    public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(category));
+    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(categoryRequest));
     }
 
     @PutMapping("/categories/{categoryId}")
-    public ResponseEntity<String> updateCategory(@PathVariable Long categoryId,@Valid @RequestBody Category category) {
-        return ResponseEntity.ok(categoryService.updateCategory(categoryId, category));
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long categoryId,@Valid @RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.ok(categoryService.updateCategory(categoryId, categoryRequest));
     }
 
     @DeleteMapping("/categories/{categoryId}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(categoryService.deleteCategory(categoryId));
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
+        categoryService.deleteCategory(categoryId);
+        return ResponseEntity.noContent().build();
     }
 }

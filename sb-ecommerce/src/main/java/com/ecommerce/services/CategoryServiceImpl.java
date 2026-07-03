@@ -1,8 +1,12 @@
 package com.ecommerce.services;
 
+import com.ecommerce.common.PagedResponse;
 import com.ecommerce.exceptions.APIException;
 import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.mappers.CategoryMapper;
 import com.ecommerce.models.Category;
+import com.ecommerce.payload.CategoryRequest;
+import com.ecommerce.payload.CategoryResponse;
 import com.ecommerce.repositories.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,47 +17,58 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public PagedResponse<CategoryResponse> getAllCategories() {
+        List<CategoryResponse> categoryResponseList = categoryRepository.findAll()
+            .stream()
+            .map(categoryMapper::toResponse)
+            .toList();
+
+        return new PagedResponse<>(categoryResponseList);
     }
 
     @Override
     @Transactional
-    public Category createCategory(Category category) {
-        categoryRepository.findByCategoryNameIgnoreCase(category.getCategoryName())
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+        categoryRepository.findByCategoryNameIgnoreCase(categoryRequest.categoryName())
             .ifPresent(categoryFound -> {
                 throw new APIException("Category " + categoryFound.getCategoryName() + " already exist. Duplicates are not allowed!!");
             });
 
-        return categoryRepository.save(category);
+        Category category = categoryMapper.toCategory(categoryRequest);
+
+        Category savedCategory = categoryRepository.save(category);
+
+        return categoryMapper.toResponse(savedCategory);
     }
 
     @Override
     @Transactional
-    public String deleteCategory(Long categoryId) {
+    public void deleteCategory(Long categoryId) {
         Category categoryToBeDeleted = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
         categoryRepository.delete(categoryToBeDeleted);
-        return "Deleted category: " + categoryId;
     }
 
     @Override
     @Transactional
-    public String updateCategory(Long categoryId, Category category) {
+    public CategoryResponse updateCategory(Long categoryId, CategoryRequest categoryRequest) {
         Category categoryFound = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
-        categoryFound.setCategoryName(category.getCategoryName());
+        categoryFound.setCategoryName(categoryRequest.categoryName());
 
-        categoryRepository.save(categoryFound);
-        return "Updated category: " + categoryFound.getCategoryName();
+        Category savedCategory = categoryRepository.save(categoryFound);
+
+        return categoryMapper.toResponse(savedCategory);
     }
 }
