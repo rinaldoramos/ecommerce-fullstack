@@ -8,31 +8,25 @@ import com.ecommerce.models.Category;
 import com.ecommerce.payload.CategoryRequest;
 import com.ecommerce.payload.CategoryResponse;
 import com.ecommerce.repositories.CategoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-    }
-
     @Override
     @Transactional(readOnly = true)
-    public PagedResponse<CategoryResponse> getAllCategories() {
-        List<CategoryResponse> categoryResponseList = categoryRepository.findAll()
-            .stream()
-            .map(categoryMapper::toResponse)
-            .toList();
-
-        return new PagedResponse<>(categoryResponseList);
+    public PagedResponse<CategoryResponse> getAllCategories(Pageable pageable) {
+        Page<CategoryResponse> categoryPage =
+            categoryRepository.findAll(pageable).map(categoryMapper::toResponse);
+        return PagedResponse.from(categoryPage);
     }
 
     @Override

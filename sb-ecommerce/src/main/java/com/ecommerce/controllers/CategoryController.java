@@ -1,27 +1,30 @@
 package com.ecommerce.controllers;
 
 import com.ecommerce.common.PagedResponse;
+import com.ecommerce.config.AppConstant;
 import com.ecommerce.payload.CategoryRequest;
 import com.ecommerce.payload.CategoryResponse;
 import com.ecommerce.services.CategoryService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
     @GetMapping("/categories")
-    public ResponseEntity<PagedResponse<CategoryResponse>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+    public ResponseEntity<PagedResponse<CategoryResponse>> getAllCategories(
+        @PageableDefault(sort = AppConstant.SORT, direction = Sort.Direction.ASC) Pageable pageable) {
+        return ResponseEntity.ok(categoryService.getAllCategories(pageable));
     }
 
     @PostMapping("/categories")
