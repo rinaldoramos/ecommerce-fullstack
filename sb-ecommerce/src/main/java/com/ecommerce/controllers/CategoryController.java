@@ -1,7 +1,7 @@
 package com.ecommerce.controllers;
 
 import com.ecommerce.common.PagedResponse;
-import com.ecommerce.config.AppConstant;
+import com.ecommerce.config.CategoryConstant;
 import com.ecommerce.payload.CategoryRequest;
 import com.ecommerce.payload.CategoryResponse;
 import com.ecommerce.services.CategoryService;
@@ -23,7 +23,7 @@ public class CategoryController {
 
     @GetMapping("/categories")
     public ResponseEntity<PagedResponse<CategoryResponse>> getAllCategories(
-        @PageableDefault(sort = AppConstant.SORT, direction = Sort.Direction.ASC) Pageable pageable) {
+        @PageableDefault(sort = CategoryConstant.SORT, direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(categoryService.getAllCategories(pageable));
     }
 
