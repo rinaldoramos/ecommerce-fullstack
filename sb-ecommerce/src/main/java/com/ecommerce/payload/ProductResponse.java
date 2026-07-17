@@ -10,6 +10,7 @@ public record ProductResponse(
     Integer quantity,
     BigDecimal price,
     BigDecimal discount,
-    BigDecimal specialPrice
+    BigDecimal specialPrice,
+    CategoryResponse categoryResponse
 ) {
 }

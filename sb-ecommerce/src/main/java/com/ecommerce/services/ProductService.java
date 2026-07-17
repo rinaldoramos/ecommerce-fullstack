@@ -11,4 +11,13 @@ public interface ProductService {
 
     @EntityGraph(attributePaths = "category")
     PagedResponse<ProductResponse> findAllProducts(Pageable pageable);
+
+    @EntityGraph(attributePaths = "category")
+    PagedResponse<ProductResponse> findProductsByCategory(Long categoryId, Pageable pageable);
+
+    PagedResponse<ProductResponse> findByKeyword(String keyword, Pageable pageable);
+
+    ProductResponse updateProduct(Long productId, ProductRequest productRequest);
+
+    void deleteProduct(Long productId);
 }

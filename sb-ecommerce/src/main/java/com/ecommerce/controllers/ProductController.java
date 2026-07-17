@@ -32,4 +32,74 @@ public class ProductController {
     ) {
         return ResponseEntity.ok(productService.findAllProducts(pageable));
     }
+
+    @GetMapping("categories/{categoryId}/products")
+    public ResponseEntity<PagedResponse<ProductResponse>> getProductsByCategory(
+        @PathVariable Long categoryId,
+        @PageableDefault(sort = ProductConstant.SORT, direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.findProductsByCategory(categoryId, pageable));
+    }
+
+    @GetMapping("/products/keyword/{keyword}")
+    public ResponseEntity<PagedResponse<ProductResponse>> getProductsByKeyword(
+        @PathVariable String keyword,
+        @PageableDefault(sort = ProductConstant.SORT, direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.FOUND).body(productService.findByKeyword(keyword, pageable));
+    }
+
+    @PutMapping("/product/{productId}")
+    public ResponseEntity<ProductResponse> updateProduct(
+        @PathVariable Long productId,
+        @Valid @RequestBody ProductRequest productRequest
+    ) {
+        return ResponseEntity.ok(productService.updateProduct(productId, productRequest));
+    }
+
+    @DeleteMapping("/product/{productId}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

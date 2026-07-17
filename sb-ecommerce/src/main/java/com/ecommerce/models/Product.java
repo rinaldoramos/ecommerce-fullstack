@@ -1,11 +1,12 @@
 package com.ecommerce.models;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity(name = "products")
 @Data
