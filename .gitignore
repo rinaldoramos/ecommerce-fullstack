@@ -4,6 +4,7 @@
 sb-ecommerce/target/
 sb-ecommerce/.idea/
 sb-ecommerce/*.iml
+sb-ecommerce/images/
 
 # ========================
 # React (frontend)

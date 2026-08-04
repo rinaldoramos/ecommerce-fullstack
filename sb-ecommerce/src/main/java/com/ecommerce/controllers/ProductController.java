@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
@@ -55,6 +56,14 @@ public class ProductController {
         @Valid @RequestBody ProductRequest productRequest
     ) {
         return ResponseEntity.ok(productService.updateProduct(productId, productRequest));
+    }
+
+    @PutMapping("/product/{productId}/image")
+    public ResponseEntity<ProductResponse> updateProductImage(
+        @PathVariable Long productId,
+        MultipartFile image
+    ) {
+        return ResponseEntity.ok(productService.updateProductImage(productId, image));
     }
 
     @DeleteMapping("/product/{productId}")

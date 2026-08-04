@@ -5,6 +5,7 @@ import com.ecommerce.payload.ProductRequest;
 import com.ecommerce.payload.ProductResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductService {
     ProductResponse saveProduct(ProductRequest productRequest, Long categoryId);
@@ -20,4 +21,6 @@ public interface ProductService {
     ProductResponse updateProduct(Long productId, ProductRequest productRequest);
 
     void deleteProduct(Long productId);
+
+    ProductResponse updateProductImage(Long productId, MultipartFile image);
 }

@@ -1,6 +1,7 @@
 package com.ecommerce.services;
 
 import com.ecommerce.common.PagedResponse;
+import com.ecommerce.exceptions.APIException;
 import com.ecommerce.exceptions.ResourceNotFoundException;
 import com.ecommerce.mappers.ProductMapper;
 import com.ecommerce.models.Category;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final FileService fileService;
 
     @Transactional(readOnly = true)
     @Override
@@ -75,6 +78,29 @@ public class ProductServiceImpl implements ProductService {
             .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
         productRepository.delete(productToBeDeleted);
+    }
+
+    @Transactional
+    @Override
+    public ProductResponse updateProductImage(Long productId, MultipartFile image) {
+        if (image == null || image.isEmpty()) {
+            throw new APIException("Image is required");
+        }
+
+        Product productFound = productRepository.findById(productId)
+            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        String oldImage = productFound.getImage();
+
+        String newImage = fileService.saveImage(image);
+
+        productFound.setImage(newImage);
+
+        fileService.deleteOldImage(oldImage);
+
+        Product updatedProductWithImage = productRepository.save(productFound);
+
+        return productMapper.toResponse(updatedProductWithImage);
     }
 
     @Transactional

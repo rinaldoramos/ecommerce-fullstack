@@ -1,17 +1,17 @@
 package com.ecommerce.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Entity(name = "products")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Product {
 
     @Id
@@ -39,9 +39,15 @@ public class Product {
     @Column(nullable = false, precision = 8, scale = 2)
     private BigDecimal specialPrice;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @PrePersist
     @PreUpdate
