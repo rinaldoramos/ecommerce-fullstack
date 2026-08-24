@@ -1,6 +1,7 @@
 package com.ecommerce.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import java.util.HashSet;
@@ -32,14 +33,15 @@ public class User {
     private String password;
 
     @Column(nullable = false, length = 20, name = "email")
+    @Email(message = "Please enter a valid email address")
     private String email;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     @Column(name = "product_id")
-    private Set<Product> products;
+    private Set<Product> products = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
         name = "users_roles",
         joinColumns = @JoinColumn(name = "user_id"),

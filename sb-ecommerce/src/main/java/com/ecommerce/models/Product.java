@@ -11,6 +11,7 @@ import java.math.RoundingMode;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "products")
 @ToString
 public class Product {
 
@@ -45,8 +46,8 @@ public class Product {
     private Category category;
 
     @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "seller_id", nullable = false)
     private User user;
 
     @PrePersist
