@@ -15,16 +15,17 @@ import java.util.Set;
 @ToString
 @Table(
     name = "users",
-    uniqueConstraints = @UniqueConstraint(
-        columnNames = {"username", "email"}
-    )
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_users_username", columnNames = "username"),
+        @UniqueConstraint(name = "uk_users_email", columnNames = "email")
+    }
 )
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private long userId;
+    private Long userId;
 
     @Column(nullable = false, length = 100, name = "username")
     private String username;
@@ -32,13 +33,12 @@ public class User {
     @Column(nullable = false, length = 100, name = "password")
     private String password;
 
-    @Column(nullable = false, length = 20, name = "email")
+    @Column(nullable = false, length = 255, name = "email")
     @Email(message = "Please enter a valid email address")
     private String email;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    @Column(name = "product_id")
     private Set<Product> products = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
@@ -47,7 +47,6 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @Column(name = "role_id")
     private Set<Role> roles = new HashSet<>();
 
 
@@ -58,4 +57,10 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "address_id")
     )
     private Set<Address> addresses = new HashSet<>();
+
+    public User(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
 }

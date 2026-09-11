@@ -1,7 +1,9 @@
 package com.ecommerce.security.config;
 
-import com.ecommerce.security.exceptions.AuthDenyHandler;
 import com.ecommerce.security.filter.AuthenticationTokenFilter;
+import com.ecommerce.security.filter.CsrfCookieFilter;
+import com.ecommerce.security.filter.NonClearingCsrfTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -18,9 +20,13 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
-//@EnableMethodSecurity
+@RequiredArgsConstructor
 public class MySecurityFilterChain {
 
     private final AuthenticationEntryPoint authenticationEntryPoint;
@@ -28,33 +34,26 @@ public class MySecurityFilterChain {
     private final AuthenticationTokenFilter authenticationTokenFilter;
     private final UserDetailsService userDetailsService;
 
-    public MySecurityFilterChain(
-        AuthenticationEntryPoint authenticationEntryPoint,
-        AuthenticationTokenFilter authenticationTokenFilter,
-        UserDetailsService userDetailsService,
-        AuthDenyHandler authDenyHandler) {
-
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.authenticationTokenFilter = authenticationTokenFilter;
-        this.userDetailsService = userDetailsService;
-        this.accessDeniedHandler = authDenyHandler;
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(csrfTokenRepository())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .ignoringRequestMatchers("/api/auth/**", "/h2-console/**")
+            )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exception -> exception
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint))
+            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
             .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
             .authorizeHttpRequests(request ->
                 request
                     .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers("/v3/api-docs/**").permitAll()
-                    .requestMatchers("/api/admin/**").permitAll()
-                    .requestMatchers("/api/public/**").permitAll()
                     .requestMatchers("/swagger-ui/**").permitAll()
                     .requestMatchers("/api/test/**").permitAll()
                     .requestMatchers("/images/**").permitAll()
@@ -80,11 +79,19 @@ public class MySecurityFilterChain {
     }
 
     @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        return new NonClearingCsrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+    }
+
+    @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web ->
             web.ignoring().requestMatchers(
-                "/v2/api-docs",
-                ""
+                "/configuration/ui",
+                "/swagger-resources/**",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/webjars/**"
             ));
     }
 }

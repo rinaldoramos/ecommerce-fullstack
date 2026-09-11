@@ -17,8 +17,7 @@ public class Role {
     @Column(name = "role_id")
     private Long roleId;
 
-    @ToString.Exclude
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20, name = "role_name")
+    @Column(nullable = false, length = 20, name = "role_name", unique = true)
     private AppRole appRole;
 }
