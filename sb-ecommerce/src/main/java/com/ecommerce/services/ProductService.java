@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductService {
-    ProductResponse saveProduct(ProductRequest productRequest, Long categoryId);
+    ProductResponse saveProduct(ProductRequest productRequest, Long categoryId, String username);
 
     @EntityGraph(attributePaths = "category")
     PagedResponse<ProductResponse> findAllProducts(Pageable pageable);

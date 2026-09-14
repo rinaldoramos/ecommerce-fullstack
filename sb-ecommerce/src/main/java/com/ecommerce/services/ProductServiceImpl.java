@@ -6,14 +6,19 @@ import com.ecommerce.exceptions.ResourceNotFoundException;
 import com.ecommerce.mappers.ProductMapper;
 import com.ecommerce.models.Category;
 import com.ecommerce.models.Product;
+import com.ecommerce.models.User;
 import com.ecommerce.payload.ProductRequest;
 import com.ecommerce.payload.ProductResponse;
 import com.ecommerce.repositories.CategoryRepository;
 import com.ecommerce.repositories.ProductRepository;
+import com.ecommerce.security.repositories.UserRepository;
+import com.ecommerce.security.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +31,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final FileService fileService;
+    private final UserRepository userRepository;
+    private final JwtUtils jwtUtils;
 
     @Transactional(readOnly = true)
     @Override
@@ -106,11 +113,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public ProductResponse saveProduct(ProductRequest productRequest, Long categoryId) {
+    public ProductResponse saveProduct(ProductRequest productRequest, Long categoryId, String username) {
         Category categoryFound = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId, HttpStatus.NOT_FOUND));
 
-        Product productToBeSaved = productMapper.toProduct(productRequest, categoryFound);
+        User sellerFound  = userRepository.findByUsername(username)
+            .orElseThrow(() -> new ResourceNotFoundException("User", "username", username, HttpStatus.NOT_FOUND));
+
+        Product productToBeSaved = productMapper.toProduct(productRequest, categoryFound, sellerFound );
 
         Product savedProduct = productRepository.save(productToBeSaved);
 

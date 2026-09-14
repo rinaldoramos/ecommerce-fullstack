@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,8 +24,11 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/categories/{categoryId}/product")
-    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest, @PathVariable Long categoryId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(productService.saveProduct(productRequest, categoryId));
+    public ResponseEntity<ProductResponse> createProduct(
+        @Valid @RequestBody ProductRequest productRequest,
+        @PathVariable Long categoryId,
+        @AuthenticationPrincipal String username) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(productService.saveProduct(productRequest, categoryId, username));
     }
 
     @GetMapping("/products")
