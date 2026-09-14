@@ -11,6 +11,7 @@ import com.ecommerce.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         categoryRepository.findByCategoryNameIgnoreCase(categoryRequest.categoryName())
             .ifPresent(categoryFound -> {
-                throw new APIException("Category " + categoryFound.getCategoryName() + " already exist. Duplicates are not allowed!!");
+                throw new APIException("Category " + categoryFound.getCategoryName() + " already exist. Duplicates are not allowed!!", HttpStatus.CONFLICT);
             });
 
         Category category = categoryMapper.toCategory(categoryRequest);
@@ -48,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(Long categoryId) {
         Category categoryToBeDeleted = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId, HttpStatus.NOT_FOUND));
 
         categoryRepository.delete(categoryToBeDeleted);
     }
@@ -57,7 +58,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse updateCategory(Long categoryId, CategoryRequest categoryRequest) {
         Category categoryFound = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId, HttpStatus.NOT_FOUND));
+
+        categoryRepository.findByCategoryNameIgnoreCase(categoryRequest.categoryName())
+            .filter(category -> !category.getCategoryId().equals(categoryId))
+            .ifPresent(category -> {
+                throw new APIException("Category " + category.getCategoryName() + " already exist. Duplicates are not allowed!!", HttpStatus.CONFLICT);
+            });
 
         categoryFound.setCategoryName(categoryRequest.categoryName());
 

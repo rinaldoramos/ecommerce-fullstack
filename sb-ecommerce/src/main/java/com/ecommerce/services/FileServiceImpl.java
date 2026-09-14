@@ -2,6 +2,7 @@ package com.ecommerce.services;
 
 import com.ecommerce.exceptions.APIException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,11 +28,11 @@ public class FileServiceImpl implements FileService {
         String originalFilename = image.getOriginalFilename();
 
         if (originalFilename == null || !originalFilename.contains("."))
-            throw new APIException("Invalid file type");
+            throw new APIException("Invalid file type", HttpStatus.BAD_REQUEST);
 
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         if (!ALLOWED_IMAGE_TYPES.contains(extension))
-            throw new APIException("Unsupported image type extension: :: " + extension);
+            throw new APIException("Unsupported image type extension: :: " + extension, HttpStatus.BAD_REQUEST);
 
         File file = new File(uploadDirectory);
         if (!file.exists())

@@ -33,8 +33,6 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
 
         logger.warn("Unauthorized access attempt: {} {} -> {}", authException.getMessage(), request.getRequestURI(), authException.getClass().getName());
 
-        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
-
-        this.apiErrorWriter.write(request, response, HttpStatus.UNAUTHORIZED, "Unauthorized! Please authenticate");
+        this.apiErrorWriter.write(request, response,"Unauthorized", HttpStatus.UNAUTHORIZED, "Unauthorized! Please authenticate with valid username and password");
     }
 }

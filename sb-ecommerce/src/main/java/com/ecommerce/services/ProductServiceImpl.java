@@ -11,6 +11,7 @@ import com.ecommerce.payload.ProductResponse;
 import com.ecommerce.repositories.CategoryRepository;
 import com.ecommerce.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PagedResponse<ProductResponse> findProductsByCategory(Long categoryId, Pageable pageable) {
         Category categoryFound = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId, HttpStatus.NOT_FOUND));
 
         Page<ProductResponse> productResponsePage = productRepository.findAllByCategory(pageable, categoryFound)
             .map(productMapper::toResponse);
@@ -59,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updateProduct(Long productId, ProductRequest productRequest) {
         Product productFromDB = productRepository.findById(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId, HttpStatus.NOT_FOUND));
 
         productMapper.updateProduct(productRequest, productFromDB);
 
@@ -75,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
             return;
 
         Product productToBeDeleted = productRepository.findById(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId, HttpStatus.NOT_FOUND));
 
         productRepository.delete(productToBeDeleted);
     }
@@ -84,11 +85,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updateProductImage(Long productId, MultipartFile image) {
         if (image == null || image.isEmpty()) {
-            throw new APIException("Image is required");
+            throw new APIException("Image is required", HttpStatus.BAD_REQUEST);
         }
 
         Product productFound = productRepository.findById(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+            .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId, HttpStatus.NOT_FOUND));
 
         String oldImage = productFound.getImage();
 
@@ -107,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse saveProduct(ProductRequest productRequest, Long categoryId) {
         Category categoryFound = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+            .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId, HttpStatus.NOT_FOUND));
 
         Product productToBeSaved = productMapper.toProduct(productRequest, categoryFound);
 

@@ -30,8 +30,8 @@ public class AuthDenyHandler implements AccessDeniedHandler {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String principal = (auth != null) ? auth.getName() : "unknown";
 
-        logger.warn("User: {} tried to access a protected resources at {} {}", principal, request.getMethod(), request.getRequestURI());
+        logger.warn("{} User: {} tried to access a protected resources at {} {}", accessDeniedException.getMessage(), principal, request.getMethod(), request.getRequestURI());
 
-        this.apiErrorWriter.write(request, response, HttpStatus.FORBIDDEN, "Access Denied! you don't have permission to access this resource");
+        this.apiErrorWriter.write(request, response, "Forbidden", HttpStatus.FORBIDDEN, "Access Denied! you don't have permission to access this resource");
     }
 }
