@@ -5,8 +5,10 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
-@Entity(name = "products")
+@Entity
 @Getter
 @Setter
 @AllArgsConstructor
@@ -46,9 +48,13 @@ public class Product {
     private Category category;
 
     @ToString.Exclude
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "seller_id", nullable = false)
-    private User user;
+    private User seller;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "product")
+    private List<CartItem> cartItems = new ArrayList<>();
 
     @PrePersist
     @PreUpdate

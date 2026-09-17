@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-    Product toProduct(ProductRequest productRequest, Category category, User user);
+    Product toProduct(ProductRequest productRequest, Category category, User seller);
 
     @Mapping(source = "category", target = "categoryResponse")
     ProductResponse toResponse(Product product);
