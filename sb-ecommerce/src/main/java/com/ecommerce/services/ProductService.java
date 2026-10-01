@@ -18,9 +18,9 @@ public interface ProductService {
 
     PagedResponse<ProductResponse> findByKeyword(String keyword, Pageable pageable);
 
-    ProductResponse updateProduct(Long productId, ProductRequest productRequest);
+    ProductResponse updateProduct(Long productId, ProductRequest productRequest, String username);
 
-    void deleteProduct(Long productId);
+    void deleteProduct(Long productId, String username);
 
-    ProductResponse updateProductImage(Long productId, MultipartFile image);
+    ProductResponse updateProductImage(Long productId, MultipartFile image, String username);
 }

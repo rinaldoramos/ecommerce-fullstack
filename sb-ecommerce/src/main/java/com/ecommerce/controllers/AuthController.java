@@ -26,6 +26,11 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final CsrfTokenRepository csrfTokenRepository;
 
+    @GetMapping("/csrf")
+    public CsrfToken csrf(CsrfToken token) {
+        return token;
+    }
+
     @PostMapping("/signing")
     public ResponseEntity<LoginResponse> signing(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         LoginCookieResponse response = authenticationService.signing(loginRequest);

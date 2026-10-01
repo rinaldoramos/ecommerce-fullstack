@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         categoryRepository.findByCategoryNameIgnoreCase(categoryRequest.categoryName())
             .ifPresent(categoryFound -> {
@@ -47,6 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteCategory(Long categoryId) {
         Category categoryToBeDeleted = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId, HttpStatus.NOT_FOUND));
@@ -56,6 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponse updateCategory(Long categoryId, CategoryRequest categoryRequest) {
         Category categoryFound = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId, HttpStatus.NOT_FOUND));

@@ -31,10 +31,11 @@ public class CartItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    // Price and discount are snapshots taken when the item was added, so repricing
-    // a product later doesn't silently change what is already in someone's cart.
     @Column(name = "product_price", nullable = false, precision = 8, scale = 2)
     private BigDecimal productPrice;
+
+    @Column(name = "product_special_price", nullable = false, precision = 8, scale = 2)
+    private BigDecimal productSpecialPrice;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cart_id", nullable = false)

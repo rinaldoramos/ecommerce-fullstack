@@ -51,28 +51,32 @@ public class ProductController {
         @PathVariable String keyword,
         @PageableDefault(sort = ProductConstant.SORT, direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        return ResponseEntity.status(HttpStatus.FOUND).body(productService.findByKeyword(keyword, pageable));
+        return ResponseEntity.ok().body(productService.findByKeyword(keyword, pageable));
     }
 
     @PutMapping("/product/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(
         @PathVariable Long productId,
-        @Valid @RequestBody ProductRequest productRequest
+        @Valid @RequestBody ProductRequest productRequest,
+        @AuthenticationPrincipal String username
     ) {
-        return ResponseEntity.ok(productService.updateProduct(productId, productRequest));
+        return ResponseEntity.ok(productService.updateProduct(productId, productRequest, username));
     }
 
     @PutMapping("/product/{productId}/image")
     public ResponseEntity<ProductResponse> updateProductImage(
         @PathVariable Long productId,
-        MultipartFile image
+        MultipartFile image,
+        @AuthenticationPrincipal String username
     ) {
-        return ResponseEntity.ok(productService.updateProductImage(productId, image));
+        return ResponseEntity.ok(productService.updateProductImage(productId, image, username));
     }
 
     @DeleteMapping("/product/{productId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
-        productService.deleteProduct(productId);
+    public ResponseEntity<Void> deleteProduct(
+        @PathVariable Long productId,
+        @AuthenticationPrincipal String username) {
+        productService.deleteProduct(productId, username);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
